@@ -135,7 +135,7 @@ def riepilogo_corse(lista_durate: list) -> dict:
     -------
     dict
         Dizionario con le seguenti chiavi:
-        - 'totale'  : int   — numero totale di corse
+        - 'totale'  : int   — durata totale delle corse
         - 'media'   : float — durata media in minuti
         - 'max'     : int   — durata massima in minuti
         - 'min'     : int   — durata minima in minuti
@@ -152,13 +152,13 @@ def riepilogo_corse(lista_durate: list) -> dict:
     --------
     >>> riepilogo_corse([10, 30, 60, 20, 5])
     {
-        'totale': 5,
-        'media': 25.0,
-        'max': 60,
-        'min': 5,
-        'brevi': 2,
-        'medie': 2,
-        'lunghe': 1
+        'totale':   125,
+        'media':    25.0,
+        'max':      60,
+        'min':      5,
+        'brevi':    2,
+        'medie':    2,
+        'lunghe':   1
     }
     """
 
@@ -167,7 +167,7 @@ def riepilogo_corse(lista_durate: list) -> dict:
         raise ValueError("lista_durate non può essere vuota")
 
     # --[calcolo statistiche per riepilogo]--
-    t_corse =   len(lista_durate)
+    t_durata =  sum(lista_durate)
     media =     sum(lista_durate) / len(lista_durate)
     massimo =   max(lista_durate)
     minimo =    min(lista_durate)
@@ -182,7 +182,7 @@ def riepilogo_corse(lista_durate: list) -> dict:
     
     # --[creazione dizionario di output]--
     riepilogo = {
-        "totale":   t_corse,
+        "totale":   t_durata,
         "media":    media,
         "max":      massimo,
         "min":      minimo,
