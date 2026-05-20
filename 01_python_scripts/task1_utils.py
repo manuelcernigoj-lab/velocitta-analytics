@@ -192,3 +192,49 @@ def riepilogo_corse(lista_durate: list) -> dict:
         }
     
     return riepilogo
+
+"""
+Utility aggiuntiva per validare il formato degli id_bici utilizzando il modulo 're'
+"""
+import re
+
+def valida_id_bici(id_bici: str) -> None:
+    """
+    Valida il formato di un id bicicletta tramite espressione regolare.
+
+    Il formato atteso è 'AA-000': due lettere maiuscole, un trattino,
+    tre cifre numeriche. Esempi validi: 'MI-042', 'TO-001', 'RM-300'.
+
+    Pattern regex utilizzato: r"^[A-Z]{2}-\\d{3}$"
+        - ^        inizio stringa
+        - [A-Z]{2} esattamente 2 lettere maiuscole (A-Z)
+        - -        trattino letterale
+        - \\d{3}   esattamente 3 cifre numeriche (0-9)
+        - $        fine stringa
+
+    Parameters
+    ----------
+    id_bici : str
+        Identificativo della bicicletta da validare.
+
+    Returns
+    -------
+    None
+        Non restituisce nulla se il formato è valido.
+
+    Raises
+    ------
+    ValueError
+        Se id_bici non rispetta il formato 'AA-000'.
+
+    Examples
+    --------
+    >>> valida_id_bici('MI-042')   # nessun errore
+    >>> valida_id_bici('mi-042')
+    ValueError: Formato id non valido 'mi-042': atteso 'AA-000'
+    >>> valida_id_bici('MI-42')
+    ValueError: Formato id non valido 'MI-42': atteso 'AA-000'
+    """
+
+    if not re.match(r"^[A-Z]{2}-\d{3}$", id_bici):
+        raise ValueError(f"Formato id non valido '{id_bici}': atteso 'AA-000'")
