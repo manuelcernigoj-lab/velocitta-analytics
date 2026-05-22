@@ -10,186 +10,252 @@ Contenuto:
 
 import pandas as pd
 import numpy as np
+import random
 from task1_utils import classifica_corsa
 
 
 # --[creazione DataFrame]--
 
-# [ 1 ] df_corse: 85 righe (80 base + 5 duplicati espliciti)
+# [ 1 ] df_corse: 185 righe (180 base + 5 duplicati espliciti)
 #                 presenti 8 NaN sparsi: 4 in durata_minuti, 4 in km_percorsi
+random.seed(42)
+np.random.seed(42)
 
-corse_data = [
-#    id_corsa id_bici   id_utente  citta      data_corsa     dur  km    fascia
-    ("C-001", "MI-001", "U-MI-01", "Milano",  "2026-04-02",  22,  3.80, "mattina"),
-    ("C-002", "MI-005", "U-MI-01", "Milano",  "2026-04-05",  35,  6.20, "mattina"),
-    ("C-003", "MI-006", "U-MI-01", "Milano",  "2026-04-08",  18,  3.10, "pomeriggio"),
-    ("C-004", "MI-001", "U-MI-01", "Milano",  "2026-04-10",  28,  4.90, "mattina"),
-    ("C-005", "MI-007", "U-MI-02", "Milano",  "2026-04-12",  42,  7.50, "pomeriggio"),
-    ("C-006", "MI-002", "U-MI-02", "Milano",  "2026-04-15",  15,  2.70, "sera"),
-    ("C-007", "MI-008", "U-MI-03", "Milano",  "2026-04-18",  55,  9.80, "mattina"),
-    ("C-008", "MI-003", "U-MI-03", "Milano",  "2026-04-20",  12,  2.10, "pomeriggio"),
-    ("C-009", "MI-009", "U-MI-04", "Milano",  "2026-04-22",  33,  5.90, "sera"),
-    ("C-010", "MI-005", "U-MI-04", "Milano",  "2026-04-25",  48,  8.60, "mattina"),
-    ("C-011", "MI-001", "U-MI-05", "Milano",  "2026-05-02",  20,  3.50, "mattina"),
-    ("C-012", "MI-006", "U-MI-05", "Milano",  "2026-05-08",  38,  6.80, "pomeriggio"),
-    ("C-013", "MI-002", "U-MI-06", "Milano",  "2026-03-10",  25,  4.40, "sera"),
-    ("C-014", "MI-007", "U-MI-06", "Milano",  "2026-03-15",  40,  7.10, "mattina"),
-    ("C-015", "MI-003", "U-MI-07", "Milano",  "2026-03-20",  17,  3.00, "pomeriggio"),
-    ("C-016", "MI-008", "U-MI-07", "Milano",  "2026-04-03",  52,  9.30, "sera"),
-    ("C-017", "MI-004", "U-MI-08", "Milano",  "2026-04-07",  10,  1.80, "mattina"),
-    ("C-018", "MI-009", "U-MI-08", "Milano",  "2026-04-11",  30,  5.40, "pomeriggio"),
-    ("C-019", "MI-010", "U-MI-09", "Milano",  "2026-04-14",  45,  8.00, "sera"),
-    ("C-020", "MI-001", "U-MI-09", "Milano",  "2026-04-17",  22,  3.90, "mattina"),
-    # NaN su durata_minuti Milano
-    ("C-021", "MI-005", "U-MI-10", "Milano",  "2026-04-21", None, 10.70, "pomeriggio"),
-    ("C-022", "MI-006", "U-MI-10", "Milano",  "2026-04-24", None,  2.50, "sera"),
-    # NaN su km_percorsi Milano
-    ("C-023", "MI-007", "U-MI-01", "Milano",  "2026-05-05",  36,  None, "mattina"),
-    ("C-024", "MI-002", "U-MI-02", "Milano",  "2026-04-04",  19,  None, "pomeriggio"),
-    ("C-025", "MI-004", "U-MI-03", "Milano",  "2026-04-06",  27,  4.80, "sera"),
-    ("C-026", "MI-008", "U-MI-04", "Milano",  "2026-04-09",   8,  1.40, "mattina"),
-    ("C-027", "MI-003", "U-MI-05", "Milano",  "2026-04-13",  44,  7.90, "pomeriggio"),
-    ("C-028", "MI-010", "U-MI-06", "Milano",  "2026-04-16",  31,  5.60, "sera"),
-    # Roma
-    ("C-029", "RM-001", "U-RM-01", "Roma",    "2026-04-01",  30,  5.40, "mattina"),
-    ("C-030", "RM-005", "U-RM-01", "Roma",    "2026-04-04",  43,  7.70, "pomeriggio"),
-    ("C-031", "RM-006", "U-RM-02", "Roma",    "2026-04-07",  19,  3.40, "sera"),
-    ("C-032", "RM-002", "U-RM-02", "Roma",    "2026-04-10",  55,  9.90, "mattina"),
-    ("C-033", "RM-007", "U-RM-03", "Roma",    "2026-04-13",  14,  2.50, "pomeriggio"),
-    ("C-034", "RM-008", "U-RM-03", "Roma",    "2026-04-16",  38,  6.80, "sera"),
-    ("C-035", "RM-003", "U-RM-04", "Roma",    "2026-04-19",  26,  4.70, "mattina"),
-    ("C-036", "RM-009", "U-RM-04", "Roma",    "2026-04-22",  50,  8.90, "pomeriggio"),
-    ("C-037", "RM-010", "U-RM-05", "Roma",    "2026-04-25",  22,  3.90, "sera"),
-    ("C-038", "RM-004", "U-RM-05", "Roma",    "2026-04-28",  60, 10.80, "mattina"),
-    ("C-039", "RM-005", "U-RM-06", "Roma",    "2026-05-04",  33,  5.90, "pomeriggio"),
-    ("C-040", "RM-002", "U-RM-06", "Roma",    "2026-03-05",  28,  5.00, "sera"),
-    ("C-041", "RM-006", "U-RM-07", "Roma",    "2026-03-12",  45,  8.10, "mattina"),
-    ("C-042", "RM-007", "U-RM-07", "Roma",    "2026-03-19",  17,  3.00, "pomeriggio"),
-    ("C-043", "RM-008", "U-RM-08", "Roma",    "2026-04-02",  52,  9.30, "sera"),
-    ("C-044", "RM-003", "U-RM-08", "Roma",    "2026-04-06",  11,  2.00, "mattina"),
-    # NaN su durata_minuti Roma
-    ("C-045", "RM-009", "U-RM-09", "Roma",    "2026-04-10", None,  6.40, "pomeriggio"),
-    ("C-046", "RM-010", "U-RM-09", "Roma",    "2026-04-14", None,  8.60, "sera"),
-    # NaN su km_percorsi Roma
-    ("C-047", "RM-004", "U-RM-10", "Roma",    "2026-04-18",  21,  None, "mattina"),
-    ("C-048", "RM-005", "U-RM-10", "Roma",    "2026-04-22",  40,  None, "pomeriggio"),
-    ("C-049", "RM-001", "U-RM-01", "Roma",    "2026-04-03",  24,  4.30, "sera"),
-    ("C-050", "RM-003", "U-RM-02", "Roma",    "2026-04-08",  37,  6.60, "mattina"),
-    # Torino
-    ("C-051", "TO-001", "U-TO-01", "Torino",  "2026-04-01",  20,  3.60, "mattina"),
-    ("C-052", "TO-005", "U-TO-01", "Torino",  "2026-04-04",  35,  6.30, "pomeriggio"),
-    ("C-053", "TO-006", "U-TO-02", "Torino",  "2026-04-07",  48,  8.60, "sera"),
-    ("C-054", "TO-002", "U-TO-02", "Torino",  "2026-04-10",  15,  2.70, "mattina"),
-    ("C-055", "TO-007", "U-TO-03", "Torino",  "2026-04-13",  58, 10.40, "pomeriggio"),
-    ("C-056", "TO-008", "U-TO-03", "Torino",  "2026-04-17",  26,  4.70, "sera"),
-    ("C-057", "TO-003", "U-TO-04", "Torino",  "2026-04-21",  40,  7.20, "mattina"),
-    ("C-058", "TO-009", "U-TO-04", "Torino",  "2026-04-25",  12,  2.10, "pomeriggio"),
-    ("C-059", "TO-010", "U-TO-05", "Torino",  "2026-04-28",  33,  5.90, "sera"),
-    ("C-060", "TO-004", "U-TO-05", "Torino",  "2026-05-05",  22,  3.90, "mattina"),
-    ("C-061", "TO-002", "U-TO-06", "Torino",  "2026-03-08",  30,  5.40, "pomeriggio"),
-    ("C-062", "TO-006", "U-TO-06", "Torino",  "2026-03-15",  55,  9.90, "sera"),
-    ("C-063", "TO-007", "U-TO-07", "Torino",  "2026-03-22",  18,  3.20, "mattina"),
-    ("C-064", "TO-008", "U-TO-07", "Torino",  "2026-04-03",  42,  7.50, "pomeriggio"),
-    ("C-065", "TO-009", "U-TO-08", "Torino",  "2026-04-09",  10,  1.80, "sera"),
-    ("C-066", "TO-010", "U-TO-08", "Torino",  "2026-04-13",  37,  6.60, "mattina"),
-    ("C-067", "TO-001", "U-TO-09", "Torino",  "2026-04-17",  50,  8.90, "pomeriggio"),
-    ("C-068", "TO-005", "U-TO-09", "Torino",  "2026-04-21",  24,  4.30, "sera"),
-    ("C-069", "TO-003", "U-TO-10", "Torino",  "2026-04-25",  44,  7.90, "mattina"),
-    ("C-070", "TO-006", "U-TO-10", "Torino",  "2026-04-29",  16,  2.90, "pomeriggio"),
-    ("C-071", "TO-001", "U-TO-01", "Torino",  "2026-04-05",  28,  5.00, "sera"),
-    ("C-072", "TO-004", "U-TO-02", "Torino",  "2026-04-09",  39,  7.00, "mattina"),
-    ("C-073", "TO-008", "U-TO-03", "Torino",  "2026-04-12",   8,  1.40, "pomeriggio"),
-    ("C-074", "TO-003", "U-TO-04", "Torino",  "2026-04-16",  46,  8.30, "sera"),
-    ("C-075", "TO-009", "U-TO-05", "Torino",  "2026-04-20",  21,  3.80, "mattina"),
-    ("C-076", "MI-005", "U-MI-07", "Milano",  "2026-04-05",  32,  5.70, "pomeriggio"),
-    ("C-077", "MI-004", "U-MI-08", "Milano",  "2026-04-09",  46,  8.20, "sera"),
-    ("C-078", "MI-010", "U-MI-09", "Milano",  "2026-04-12",  21,  3.70, "mattina"),
-    ("C-079", "RM-001", "U-RM-03", "Roma",    "2026-04-15",  18,  3.20, "pomeriggio"),
-    ("C-080", "RM-010", "U-RM-04", "Roma",    "2026-04-20",  53,  9.50, "sera"),
-]
+# --[configurazioni base]--
+citta_list = ["Milano", "Roma", "Torino"]
+date_list = pd.date_range(
+    start = "2026-05-01",
+    end   = "2026-05-15",
+    freq  = "D")
+fasce = ["mattina", "pomeriggio", "sera"]
 
-# -- 5 righe duplicate aggiunte in fondo (stessa id_corsa e stessi dati)
-duplicati = [
-    ("C-001", "MI-001", "U-MI-01", "Milano",  "2026-04-02",  22,  3.80, "mattina"),
-    ("C-015", "MI-003", "U-MI-07", "Milano",  "2026-03-20",  17,  3.00, "pomeriggio"),
-    ("C-029", "RM-001", "U-RM-01", "Roma",    "2026-04-01",  30,  5.40, "mattina"),
-    ("C-051", "TO-001", "U-TO-01", "Torino",  "2026-04-01",  20,  3.60, "mattina"),
-    ("C-062", "TO-006", "U-TO-06", "Torino",  "2026-03-15",  55,  9.90, "sera"),
-]
+# giorni con picchi realistici:
+giorni_picco = {
+    "Monday":    1.7,
+    "Tuesday":   1.8,
+    "Wednesday": 1.9,
+    "Thursday":  1.8,
+    "Friday":    1.6,
+    # ↘ lunedì/venerdì: commuting
+    "Saturday":  1.0,
+    "Sunday":    0.8}
+    # ↘ weekend: utilizzo leisure
 
-colonne_corse = ["id_corsa", "id_bici", "id_utente", "citta",
-                 "data_corsa", "durata_minuti", "km_percorsi", "fascia_oraria"]
+# distribuzione fasce orarie
+fascia_weights_weekday = [
+    0.45,  # mattina        -> commuting
+    0.20,  # pomeriggio     -> uso normale
+    0.35]  # sera           -> svago / rientro
+fascia_weights_weekend = [
+    0.20,  # mattina
+    0.35,  # pomeriggio
+    0.45]  # sera
 
-df_corse = pd.DataFrame(corse_data + duplicati, columns = colonne_corse)
+records = []
+id_counter = 1
 
+# --[generazione dati]--
+for data in date_list:
+    giorno_nome = data.day_name()
 
-# [ 2 ] df_bici: 20 righe
-bici_data = [
-#    id_bici   tipo         citta      anno  costo
-    ("MI-001", "classica",  "Milano",  2021, 320.00),
-    ("MI-002", "classica",  "Milano",  2020, 290.00),
-    ("MI-003", "classica",  "Milano",  2022, 310.00),
-    ("MI-004", "classica",  "Milano",  2021, 305.00),
-    ("MI-005", "elettrica", "Milano",  2023, 850.00),
-    ("MI-006", "elettrica", "Milano",  2022, 820.00),
-    ("MI-007", "elettrica", "Milano",  2023, 870.00),
-    ("RM-001", "classica",  "Roma",    2020, 280.00),
-    ("RM-002", "classica",  "Roma",    2021, 295.00),
-    ("RM-003", "classica",  "Roma",    2022, 315.00),
-    ("RM-005", "elettrica", "Roma",    2023, 860.00),
-    ("RM-006", "elettrica", "Roma",    2022, 830.00),
-    ("RM-007", "elettrica", "Roma",    2023, 845.00),
-    ("TO-001", "classica",  "Torino",  2021, 300.00),
-    ("TO-002", "classica",  "Torino",  2020, 275.00),
-    ("TO-003", "classica",  "Torino",  2022, 320.00),
-    ("TO-004", "classica",  "Torino",  2021, 290.00),
-    ("TO-005", "elettrica", "Torino",  2023, 840.00),
-    ("TO-006", "elettrica", "Torino",  2022, 815.00),
-    ("TO-008", "elettrica", "Torino",  2023, 855.00),
-]
+    # corse base giornaliere
+    corse_giornaliere = 8
 
-colonne_bici = ["id_bici", "tipo", "citta", "anno_acquisto", "costo_acquisto"]
-df_bici = pd.DataFrame(bici_data, columns = colonne_bici)
+    # applicazione picchi
+    moltiplicatore = giorni_picco.get(giorno_nome, 1)
+    corse_giornaliere = int(corse_giornaliere * moltiplicatore)
+
+    # rumore realistico
+    corse_giornaliere += np.random.randint(low = 0, high = 2)
+    for _ in range(corse_giornaliere):
+        # lista delle città con pesi differenti
+        citta = random.choices(
+            citta_list,
+            weights = [0.45, 0.35, 0.20])[0]
+
+        # sigle delle città per id_bici
+        sigla = {
+            "Milano":   "MI",
+            "Roma":     "RM",
+            "Torino":   "TO"
+            }[citta]
+
+        # distribuzione fasce diversa weekend/feriali
+        if giorno_nome in ["Saturday", "Sunday"]:
+            fascia = random.choices(
+                population = fasce,
+                weights = fascia_weights_weekend)[0]
+        else:
+            fascia = random.choices(
+                population = fasce,
+                weights = fascia_weights_weekday)[0]
+
+        # durate realistiche per fascia
+        if fascia == "mattina":
+            durata = np.random.randint(low = 8, high = 30)
+            km = round(np.random.uniform(low = 1.5, high = 6.0), 2)
+        elif fascia == "pomeriggio":
+            durata = np.random.randint(low = 15, high = 45)
+            km = round(np.random.uniform(low = 2.0, high = 10.0), 2)
+        else:
+            durata = np.random.randint(low = 20, high = 60)
+            km = round(np.random.uniform(low = 3.0, high = 15.0), 2)
+
+        record = {
+            "id_corsa": f"C-{id_counter:03d}",
+            "id_bici": f"{sigla}-{np.random.randint(1, 41):03d}",
+            "id_utente": f"U-{sigla}-{np.random.randint(1, 81):02d}",
+            "citta": citta,
+            "data_corsa": data.strftime("%Y-%m-%d"),
+            "durata_minuti": durata,
+            "km_percorsi": km,
+            "fascia_oraria": fascia}
+
+        records.append(record)
+        id_counter += 1
+
+# --[creazione DataFrame]--
+df_corse = pd.DataFrame(records)
+
+# --[inserimento 5 duplicati]--
+duplicati = df_corse.sample(n = 5, random_state = 42)
+df_corse = pd.concat([df_corse, duplicati], ignore_index = True)
+
+# --[inserimento 8 NaN]--
+nan_idx_durata = np.random.choice(df_corse.index, size = 4, replace = False)
+nan_idx_km = np.random.choice(df_corse.index, size = 4, replace = False)
+
+df_corse.loc[nan_idx_durata, "durata_minuti"] = np.nan
+df_corse.loc[nan_idx_km, "km_percorsi"] = np.nan
+
+# [ 2 ] df_bici: 80 righe (30 per Milano/Roma, 20 per Torino)
+
+# --[configurazioni base]--
+tipi_bici = ["classica", "elettrica"]
+anni = [2020, 2021, 2022, 2023, 2024]
+bici_data = []
+
+# distribuzioni bici realistiche rispetto a df_corse
+distribuzione_bici = {
+    "Milano":   30,
+    "Roma":     30,
+    "Torino":   20}
+
+# contatori separati per città
+contatori_citta = {
+    "Milano":   1,
+    "Roma":     1,
+    "Torino":   1}
+
+# --[generazione dati]--
+for citta, quantita in distribuzione_bici.items():
+    sigla = {
+        "Milano":   "MI",
+        "Roma":     "RM",
+        "Torino":   "TO"
+        }[citta]
+    for _ in range(quantita):
+        numero_bici = contatori_citta[citta]
+        contatori_citta[citta] += 1
+
+        # distribuzione classiche più numerose delle elettriche
+        tipo = random.choices(
+            population = tipi_bici,
+            weights = [0.65, 0.35])[0]
+        
+        anno = random.choice(anni)
+
+        # costi realistici
+        if tipo == "classica":
+            # bici classiche: circa 250€ - 500€ 
+            costo = round(np.random.uniform(low = 250, high = 500), 2)
+        else:
+            # bici elettriche: circa 1200€ - 2800€
+            costo = round(np.random.uniform(low = 1200, high = 2800), 2)
+
+        bici_data.append(
+            (f"{sigla}-{numero_bici:03d}",
+            tipo,
+            citta,
+            anno,
+            costo))
+
+# --[creazione DataFrame]--
+df_bici = pd.DataFrame(bici_data, columns = [
+    "id_bici",
+    "tipo",
+    "citta",
+    "anno",
+    "costo"])
 
 
 # [ 3 ] df_utenti: 25 righe
-utenti_data = [
-#    id_utente  nome                citta      abbonamento  iscrizione
-    ("U-MI-01", "Luca Rossi",       "Milano",  "Premium",   "2024-01-10"),
-    ("U-MI-02", "Sara Bianchi",     "Milano",  "Base",      "2024-03-22"),
-    ("U-MI-03", "Marco Verdi",      "Milano",  "Premium",   "2023-11-05"),
-    ("U-MI-04", "Anna Neri",        "Milano",  "Base",      "2024-06-18"),
-    ("U-MI-05", "Paolo Ferrari",    "Milano",  "Premium",   "2023-08-30"),
-    ("U-MI-06", "Giulia Russo",     "Milano",  "Base",      "2024-02-14"),
-    ("U-MI-07", "Matteo Esposito",  "Milano",  "Premium",   "2023-12-01"),
-    ("U-MI-08", "Chiara Romano",    "Milano",  "Base",      "2024-04-09"),
-    ("U-MI-09", "Davide Greco",     "Milano",  "Premium",   "2024-01-25"),
-    ("U-MI-10", "Elena Marino",     "Milano",  "Base",      "2024-05-03"),
-    ("U-RM-01", "Alessio Conti",    "Roma",    "Premium",   "2023-09-12"),
-    ("U-RM-02", "Francesca Ricci",  "Roma",    "Base",      "2024-07-01"),
-    ("U-RM-03", "Simone Lombardi",  "Roma",    "Premium",   "2023-10-20"),
-    ("U-RM-04", "Valentina Costa",  "Roma",    "Base",      "2024-02-28"),
-    ("U-RM-05", "Roberto Gallo",    "Roma",    "Premium",   "2023-07-15"),
-    ("U-RM-06", "Monica Bruno",     "Roma",    "Base",      "2024-08-05"),
-    ("U-RM-07", "Stefano Martini",  "Roma",    "Premium",   "2024-03-11"),
-    ("U-RM-08", "Laura Serra",      "Roma",    "Base",      "2024-01-30"),
-    ("U-RM-09", "Andrea Fontana",   "Roma",    "Premium",   "2023-11-22"),
-    ("U-RM-10", "Paola Caruso",     "Roma",    "Base",      "2024-06-07"),
-    ("U-TO-01", "Giorgio Fiore",    "Torino",  "Premium",   "2023-12-15"),
-    ("U-TO-02", "Silvia Marini",    "Torino",  "Base",      "2024-04-20"),
-    ("U-TO-03", "Fabio Santoro",    "Torino",  "Premium",   "2024-02-08"),
-    ("U-TO-04", "Cristina Vitale",  "Torino",  "Base",      "2024-07-14"),
-    ("U-TO-05", "Enrico De Luca",   "Torino",  "Premium",   "2023-08-03"),
-    ("U-TO-06", "Marta Galli",      "Torino",  "Base",      "2024-05-25"),
-    ("U-TO-07", "Nicola Ferri",     "Torino",  "Premium",   "2023-10-10"),
-    ("U-TO-08", "Teresa Monti",     "Torino",  "Base",      "2024-03-17"),
-    ("U-TO-09", "Claudio Barbieri", "Torino",  "Premium",   "2024-01-05"),
-    ("U-TO-10", "Irene Cattaneo",   "Torino",  "Base",      "2024-06-30"),
-]
 
-colonne_utenti = ["id_utente", "nome", "citta", "tipo_abbonamento", "data_iscrizione"]
-df_utenti = pd.DataFrame(utenti_data, columns = colonne_utenti)
+# --[configurazioni base]--
+nomi = ["Luca", "Marco", "Giulia", "Anna", "Francesca",
+        "Davide", "Alessandro", "Sara", "Matteo", "Chiara",
+        "Stefano", "Elena", "Simone", "Martina", "Paolo",
+        "Federica", "Andrea", "Valentina", "Riccardo", "Laura",
+        "Giorgio", "Beatrice", "Fabio", "Marta", "Daniele",
+        "Irene", "Emanuele", "Camilla", "Filippo", "Silvia"]
+cognomi = ["Rossi", "Bianchi", "Romano", "Ricci", "Marino",
+        "Greco", "Bruno", "Gallo", "Conti", "De Luca",
+        "Mancini", "Costa", "Giordano", "Rizzo", "Lombardi",
+        "Moretti", "Barbieri", "Fontana", "Santoro", "Mariani",
+        "Caruso", "Ferrara", "Leone", "Serra", "Villa",
+        "Ferri", "Longo", "Martinelli", "Testa", "Sala"]
+citta_config = {
+    "Milano":   {"sigla":       "MI",
+                 "n_utenti":    25},
+    "Roma":     {"sigla":       "RM",
+                 "n_utenti":    15},
+    "Torino":   {"sigla":       "TO",
+                 "n_utenti":    10}}
+tipi_abbonamento = [
+    "Basic",
+    "Premium",
+    "Student"]
 
+# distribuzione realistica
+weights_abbonamenti = [0.45, 0.25, 0.30]
+
+# periodo iscrizioni
+date_iscrizione = pd.date_range(
+    start = "2026-04-01",
+    end =   "2026-05-15",
+    freq =  "D")
+
+utenti_data = []
+
+# --[generazione utenti]--
+for citta, config in citta_config.items():
+    sigla = config["sigla"]
+    
+    for i in range(1, config["n_utenti"] + 1):
+        nome_completo = (
+            f"{random.choice(nomi)} "
+            f"{random.choice(cognomi)}")
+        
+        tipo_abbonamento = random.choices(
+            tipi_abbonamento,
+            weights = weights_abbonamenti)[0]
+
+        data_iscrizione = random.choice(date_iscrizione).strftime("%Y-%m-%d")
+        
+        utenti_data.append(
+            (f"U-{sigla}-{i:02d}",
+            nome_completo,
+            citta,
+            tipo_abbonamento,
+            data_iscrizione))
+
+# --[creazione DataFrame]--
+df_utenti = pd.DataFrame(utenti_data, columns = [
+    "id_utente",
+    "nome",
+    "citta",
+    "tipo_abbonamento",
+    "data_iscrizione"])
 
 # --[pulizia dati]--
 print(f"\n[ 6.2 ] — Pulizia dati")
