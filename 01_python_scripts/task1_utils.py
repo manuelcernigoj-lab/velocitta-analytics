@@ -106,7 +106,7 @@ def rides_classifier(duration_min: int) -> str:
     """
 
     # --[classification by conditions if/else]--
-    if duration_min < 0:
+    if duration_min <= 0:
         raise ValueError(f"duration_min '{duration_min}' must be greater than or equal to zero'")
         # ↘ check on the insertion of negative values ​​→ raise ValueError
 
@@ -167,10 +167,10 @@ def summary_rides(duration_list: list) -> dict:
         raise ValueError("duration_list can't be empty")
 
     # --[statistics calculation for summary]--
-    t_durata =  sum(duration_list)
-    avg =       sum(duration_list) / len(duration_list)
-    maximum =   max(duration_list)
-    minimum =   min(duration_list)
+    t_duration =    sum(duration_list)
+    avg =           sum(duration_list) / len(duration_list)
+    maximum =       max(duration_list)
+    minimum =       min(duration_list)
 
     # for categorization, reuse the 'rides_classifier()' function
     short, medium, long = 0, 0, 0
@@ -182,7 +182,7 @@ def summary_rides(duration_list: list) -> dict:
     
     # --[output dictionary creation]--
     summary = {
-        "total":    t_durata,
+        "total":    t_duration,
         "average":  avg,
         "max":      maximum,
         "min":      minimum,
